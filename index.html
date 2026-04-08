@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday - Mờ Nghi</title>
+    <!-- Phông chữ hiện đại -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            color: #00ff00;
+            overflow-x: hidden;
+            /* Thay đổi con trỏ chuột thành hình thập tự tinh tế */
+            cursor: crosshair;
+        }
+
+        /* Matrix rain effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        .matrix-char {
+            position: absolute;
+            color: #00ff00;
+            font-size: 14px;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Terminal window (Glassmorphism) */
+        .terminal {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 255, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.5s ease-in-out;
+            position: relative;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .btn-close {
+            background: #ff5f56;
+        }
+
+        .btn-minimize {
+            background: #ffbd2e;
+        }
+
+        .btn-maximize {
+            background: #27c93f;
+        }
+
+        .terminal-title {
+            margin-left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* Mã nguồn trang trí */
+        .code-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .keyword {
+            color: #ff79c6;
+        }
+
+        .string {
+            color: #f1fa8c;
+        }
+
+        .comment {
+            color: #6272a4;
+        }
+
+        .function {
+            color: #50fa7b;
+        }
+
+        .variable {
+            color: #8be9fd;
+        }
+
+        /* Thông điệp sinh nhật */
+        .birthday-message {
+            text-align: center;
+            margin: 35px 0;
+            animation: fadeInUp 1s ease 1s forwards;
+        }
+
+        .birthday-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(to right, #ff0080, #00ff00, #0080ff, #ffe600);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+            margin-bottom: 15px;
+        }
+
+        @keyframes textGlow {
+            0% {
+                filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+            }
+
+            100% {
+                filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.8));
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .wishes-text {
+            font-size: 16px;
+            color: #e0e0e0;
+            line-height: 1.8;
+            margin-top: 15px;
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Nút tổng hợp */
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn-action {
+            padding: 12px 25px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-action:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .btn-special {
+            background: linear-gradient(45deg, #e100ff, #7f00ff);
+            border: 1px solid transparent;
+            color: white;
+            box-shadow: 0 0 15px rgba(225, 0, 255, 0.4);
+        }
+
+        .btn-special:hover {
+            background: linear-gradient(45deg, #ff0080, #e100ff);
+            color: white;
+            box-shadow: 0 0 25px rgba(225, 0, 255, 0.8);
+        }
+
+        .btn-fireworks {
+            background: linear-gradient(45deg, #FFD700, #FF8C00);
+            border: none;
+            color: #111;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            animation: fireworkButtonGlow 2s infinite alternate;
+        }
+
+        .btn-fireworks:hover {
+            background: linear-gradient(45deg, #FFF, #ff9a00);
+            color: #000;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+        }
+
+        @keyframes fireworkButtonGlow {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+            }
+
+            100% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-2px, 0, 0);
+                filter: hue-rotate(90deg);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(3px, 0, 0);
+                filter: hue-rotate(-90deg);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-5px, 0, 0);
+                filter: invert(0.2);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(5px, 0, 0);
+                filter: invert(0);
+            }
+        }
+
+        /* --- PHẦN GIAO DIỆN VIDEO OVERLAY --- */
+        .video-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease-in-out;
+            backdrop-filter: blur(15px);
+        }
+
+        .video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            /* Định dạng ngang rộng chuẩn */
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 255, 0, 0.3);
+            border: 2px solid rgba(0, 255, 0, 0.5);
+            transform: translateY(50px) scale(0.95);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .video-modal.active .video-wrapper {
+            transform: translateY(0) scale(1);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 20px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .video-modal.active .video-controls {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Nút trong Video Modal */
+        .btn-download {
+            background: #00ff00;
+            color: #000;
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+
+        .btn-download:hover {
+            background: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-close-modal {
+            background: #ff0055;
+            color: white;
+            border-color: #ff0055;
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+
+        .btn-close-modal:hover {
+            background: white;
+            color: #ff0055;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.8);
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 768px) {
+            .terminal {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .code-content {
+                font-size: 12px;
+            }
+
+            .wishes-text {
+                font-size: 14px;
+            }
+
+            .video-controls {
+                flex-direction: column;
+                gap: 15px;
+                width: 80%;
+            }
+
+            .btn-action {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Nền Matrix sương sương -->
+    <div class="matrix-bg" id="matrixBg"></div>
+
+    <!-- ===== Giao Diện Chính (Terminal) ===== -->
+    <div class="container" id="mainUI">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <div class="btn btn-close"></div>
+                    <div class="btn btn-minimize"></div>
+                    <div class="btn btn-maximize"></div>
+                </div>
+                <div class="terminal-title">~/birthday_monghi/run.sh</div>
+            </div>
+
+            <!-- Mã C Code Trang Trí -->
+            <div class="code-content">
+                <div class="code-line"><span class="comment">// Đang thiết lập thông số cho sinh nhật tuổi mới...</span>
+                </div>
+                <div class="code-line"><span class="keyword">const</span> <span class="function">moNghi</span> = <span
+                        class="keyword">new</span> <span class="function">Person</span>(<span class="string">"Mờ
+                        Nghi"</span>);</div>
+                <div class="code-line"><span class="function">moNghi</span>.<span class="variable">skills</span>.<span
+                        class="function">add</span>(<span class="string">"ProCoder"</span>);</div>
+                <div class="code-line"><span class="function">moNghi</span>.<span class="variable">bankBalance</span> =
+                    <span class="keyword">Infinity</span>;
+                </div>
+                <div class="code-line"><span class="keyword">await</span> <span class="function">moNghi</span>.<span
+                        class="function">deployHappiness</span>();</div>
+            </div>
+
+            <div class="birthday-message">
+                <h1 class="birthday-title">HAPPY BIRTHDAY!</h1>
+                <p style="font-size: 20px; color: #8be9fd; font-weight: bold;">
+                    Chúc mừng sinh nhật, Mờ Nghi! 🎉
+                </p>
+                <div class="wishes-text">
+                    Tuổi mới chúc bạn viết code chạy luôn không lỗi (Zero Bug), <br>
+                    Tình yêu mượt mà không crash, ví tiền luôn đầy như ổ lưu trữ 2TB!<br>
+                    Chúc Mờ Nghi luôn hạnh phúc, tràn đầy năng lượng và bùng nổ thành công và sẽ còn bên nhau nhìu nhìu
+                    cái tết nữa nha! 🚀
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button class="btn-action btn-fireworks" onclick="createConfetti()">🎇 Tung Pháo Hoa Siêu Cấp</button>
+                <!-- NÚT BẬT VIDEO NẰM GIỮA NỔI BẬT NHẤT -->
+                <button class="btn-action btn-special" onclick="openVideo()">▶ Nhấn Dô Đây Đi!!</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== Giao Diện Video Layer ===== -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-wrapper">
+            <!-- Lưu ý: Bạn cần đổi tên file mp4 được xuất ra thành "video.mp4" và để cùng thư mục với file index.html này -->
+            <video id="birthdayVideo" controls preload="auto">
+                <source src="video.mp4" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ thẻ video.
+            </video>
+        </div>
+
+        <div class="video-controls">
+            <!-- Nút Tải Video Về Máy -->
+            <a href="video.mp4" download="Happy_Birthday_Mo_Nghi.mp4" class="btn-action btn-download">
+                📥 Tải Video Về Máy
+            </a>
+            <!-- Nút Quay Lại -->
+            <button class="btn-action btn-close-modal" onclick="closeVideo()">
+                ✖ Quay Lại
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // Tạo Nền Matrix Nhẹ
+        const matrixBg = document.getElementById('matrixBg');
+        const chars = '01#%*&^M@MờNghiHappyBirthday';
+        for (let i = 0; i < 40; i++) {
+            let char = document.createElement('div');
+            char.className = 'matrix-char';
+            char.innerText = chars[Math.floor(Math.random() * chars.length)];
+            char.style.left = Math.random() * 100 + 'vw';
+            char.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            char.style.animationDelay = Math.random() * 2 + 's';
+            char.style.opacity = Math.random() * 0.5 + 0.1;
+            matrixBg.appendChild(char);
+        }
+
+        // Logic Mở/Đóng Trình Phát Video
+        const modal = document.getElementById('videoModal');
+        const videoElement = document.getElementById('birthdayVideo');
+        const mainUI = document.getElementById('mainUI');
+
+        function openVideo() {
+            // Hiện Modal Video
+            modal.classList.add('active');
+            // Mờ làm Terminal lui về phía sau một xíu
+            mainUI.style.transition = "transform 0.5s ease, opacity 0.5s";
+            mainUI.style.transform = "scale(0.9)";
+            mainUI.style.opacity = "0.2";
+
+            // Tự động phát video
+            videoElement.play().catch(error => {
+                console.log("Auto-play cần người dùng tương tác trước!");
+            });
+        }
+
+        function closeVideo() {
+            // Tạm dừng video
+            videoElement.pause();
+            // Đóng Modal
+            modal.classList.remove('active');
+            // Phục hồi giao diện chính
+            mainUI.style.transform = "scale(1)";
+            mainUI.style.opacity = "1";
+        }
+
+        // Bắn pháo hoa thủ công (siêu cấp vũ trụ)
+        function createConfetti() {
+            // Rung màn hình cực mạnh và lóe sáng màu
+            document.body.style.animation = "shake 0.5s cubic-bezier(.36,.07,.19,.97) both";
+            setTimeout(() => document.body.style.animation = "", 500);
+
+            const colors = ['#ff0080', '#00ff00', '#0080ff', '#ff8000', '#ff0040', '#8000ff', '#F1E300', '#00FFFF', '#FFD700'];
+            const numberOfParticles = 200; // Bắn ra 200 tia chớp sáng
+
+            for (let i = 0; i < numberOfParticles; i++) {
+                let f = document.createElement('div');
+                f.style.position = 'fixed';
+                f.style.width = (Math.random() * 15 + 5) + 'px';
+                f.style.height = (Math.random() * 10 + 5) + 'px';
+                f.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                f.style.left = '50%';
+                f.style.top = '50%';
+                f.style.boxShadow = `0 0 10px ${f.style.backgroundColor}, 0 0 20px ${f.style.backgroundColor}`; // Tỏa sáng lóa
+
+                // Đa dạng hình dáng hạt
+                let shapeType = Math.random();
+                if (shapeType > 0.6) f.style.borderRadius = '50%'; // Tròn
+                else if (shapeType > 0.3) f.style.borderRadius = '2px'; // Vuông
+                else f.style.clipPath = 'polygon(50% 0%, 0% 100%, 100% 100%)'; // Tam giác
+
+                f.style.zIndex = '9999';
+
+                // Tính toán Vật lý: văng tung toé ra xung quanh rồi rơi tự do (gravity)
+                let angle = Math.random() * Math.PI * 2;
+                let velocity = 150 + Math.random() * 650; // Tốc độ nổ văng bùng nổ
+                let tx = Math.cos(angle) * velocity;
+                let ty = Math.sin(angle) * velocity - 250; // Hướng văng lên trên 1 chút để tạo quỹ đạo vòng cung
+                let rotX = Math.random() * 1000;
+                let rotY = Math.random() * 1000;
+                let rotZ = Math.random() * 1000;
+
+                f.animate([
+                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+                    // Quãng 1: Bay vút lên và nổ tung toé
+                    { transform: `translate(calc(-50% + ${tx / 1.5}px), calc(-50% + ${ty / 1.5}px)) scale(1.5) rotateX(${rotX / 2}deg) rotateY(${rotY / 2}deg) rotateZ(${rotZ / 2}deg)`, opacity: 1, offset: 0.3 },
+                    // Quãng 2: Rơi rụng xuống theo trọng lực
+                    { transform: `translate(calc(-50% + ${tx * 1.5}px), calc(-50% + ${ty + window.innerHeight}px)) scale(0.5) rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1500, // Rơi lờ lững kéo dài 1.5 - 3.5 giây
+                    easing: 'cubic-bezier(0.25, 1, 0.4, 1)'
+                });
+
+                document.body.appendChild(f);
+                setTimeout(() => f.remove(), 3500);
+            }
+        }
+    </script>
+</body>
+
+</html>
