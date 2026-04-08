@@ -415,10 +415,86 @@
                 width: 100%;
             }
         }
+
+        /* --- MÀN HÌNH LOADING --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0c29;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 255, 0, 0.2);
+            border-top-color: #00ff00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loader-text {
+            color: #00ff00;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .loader-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loader-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            transition: width 0.1s;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- Màn hình Loading -->
+    <div id="loading-screen">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Đang tải cấu trúc máy chủ Sinh Nhật... <span id="loadPercent">0%</span></div>
+            <div class="loader-bar-bg">
+                <div class="loader-bar-fill" id="loadBar"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Nền Matrix sương sương -->
     <div class="matrix-bg" id="matrixBg"></div>
@@ -497,6 +573,31 @@
 
 
     <script>
+        // Xử lý màn hình Loading chuyên nghiệp 5s
+        document.addEventListener("DOMContentLoaded", () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const loadBar = document.getElementById('loadBar');
+            const loadPercent = document.getElementById('loadPercent');
+            let progress = 0;
+
+            // Chạy 5 giây (5000ms), mỗi 45ms cập nhật 1 lần -> 100 bước
+            const interval = setInterval(() => {
+                progress += 1;
+                loadBar.style.width = progress + '%';
+                loadPercent.innerText = progress + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 500); // Đợi fade out xong rồi ẩn hẳn
+                    }, 300); // Ngưng 0.3s khi đầy 100%
+                }
+            }, 45);
+        });
+
         // Tạo Nền Matrix Nhẹ
         const matrixBg = document.getElementById('matrixBg');
         const chars = '01#%*&^M@MờNghiHappyBirthday';
